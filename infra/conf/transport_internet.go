@@ -223,6 +223,7 @@ type SplitHTTPConfig struct {
 	SessionKey           string            `json:"sessionKey"`
 	SeqPlacement         string            `json:"seqPlacement"`
 	SeqKey               string            `json:"seqKey"`
+	SeqEncoding          string            `json:"seqEncoding"`
 	UplinkDataPlacement  string            `json:"uplinkDataPlacement"`
 	UplinkDataKey        string            `json:"uplinkDataKey"`
 	UplinkChunkSize      Int32Range        `json:"uplinkChunkSize"`
@@ -365,6 +366,14 @@ func (c *SplitHTTPConfig) Build() (proto.Message, error) {
 		}
 	}
 
+	switch c.SeqEncoding {
+	case "":
+		c.SeqEncoding = splithttp.SeqEncodingDecimal
+	case splithttp.SeqEncodingDecimal, splithttp.SeqEncodingMaskedHex:
+	default:
+		return nil, errors.New("unsupported seq encoding: " + c.SeqEncoding)
+	}
+
 	if c.UplinkDataPlacement != splithttp.PlacementBody && c.UplinkDataKey == "" {
 		switch c.UplinkDataPlacement {
 		case splithttp.PlacementCookie:
@@ -406,6 +415,7 @@ func (c *SplitHTTPConfig) Build() (proto.Message, error) {
 		SeqPlacement:         c.SeqPlacement,
 		SessionKey:           c.SessionKey,
 		SeqKey:               c.SeqKey,
+		SeqEncoding:          c.SeqEncoding,
 		UplinkDataPlacement:  c.UplinkDataPlacement,
 		UplinkDataKey:        c.UplinkDataKey,
 		UplinkChunkSize:      newRangeConfig(c.UplinkChunkSize),

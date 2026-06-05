@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"runtime"
 	"slices"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -333,9 +332,9 @@ func (h *requestHandler) ServeHTTP(writer http.ResponseWriter, request *http.Req
 			return
 		}
 
-		seq, err := strconv.ParseUint(seqStr, 10, 64)
+		seq, err := h.config.DecodeSeq(sessionId, seqStr)
 		if err != nil {
-			errors.LogInfoInner(context.Background(), err, "failed to upload (ParseUint)")
+			errors.LogInfoInner(context.Background(), err, "failed to upload (DecodeSeq)")
 			writer.WriteHeader(http.StatusInternalServerError)
 			return
 		}

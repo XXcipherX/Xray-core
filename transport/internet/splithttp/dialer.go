@@ -11,7 +11,6 @@ import (
 	"net/url"
 	reflect "reflect"
 	"runtime"
-	"strconv"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -505,7 +504,7 @@ func Dial(ctx context.Context, dest net.Destination, streamSettings *internet.Me
 	}
 
 	go func() {
-		var seq int64
+		var seq uint64
 		var lastWrite time.Time
 
 		dynamicHTTPClient := httpClient
@@ -535,7 +534,7 @@ func Dial(ctx context.Context, dest net.Destination, streamSettings *internet.Me
 					},
 				})
 
-				seqStr := strconv.FormatInt(seq, 10)
+				seqStr := transportConfiguration.EncodeSeq(sessionId, seq)
 				seq += 1
 
 				if scMinPostsIntervalMs.From > 0 {
