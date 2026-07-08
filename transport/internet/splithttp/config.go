@@ -24,11 +24,38 @@ func (c *Config) GetNormalizedPath() string {
 		path = "/" + path
 	}
 
+	if c.GetNormalizedPathTrailingSlash() == PathTrailingSlashAuto && !c.hasPathMeta() {
+		return path
+	}
+
 	if path[len(path)-1] != '/' {
 		path = path + "/"
 	}
 
 	return path
+}
+
+func (c *Config) GetNormalizedPathTrailingSlash() string {
+	if c.PathTrailingSlash == PathTrailingSlashAuto {
+		return PathTrailingSlashAuto
+	}
+	return PathTrailingSlashAlways
+}
+
+func (c *Config) isValidRequestPath(requestPath string, path string) bool {
+	if c.GetNormalizedPathTrailingSlash() != PathTrailingSlashAuto || c.hasPathMeta() || path == "/" {
+		return strings.HasPrefix(requestPath, path)
+	}
+
+	if requestPath == path {
+		return true
+	}
+	return !strings.HasSuffix(path, "/") && requestPath == path+"/"
+}
+
+func (c *Config) hasPathMeta() bool {
+	return c.GetNormalizedSessionPlacement() == PlacementPath ||
+		c.GetNormalizedSeqPlacement() == PlacementPath
 }
 
 func (c *Config) GetNormalizedQuery() string {

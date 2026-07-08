@@ -9,3 +9,8 @@ const (
 	PlacementBody          = "body"
 	PlacementAuto          = "auto"
 )
+
+const (
+	PathTrailingSlashAlways = "always"
+	PathTrailingSlashAuto   = "auto"
+)

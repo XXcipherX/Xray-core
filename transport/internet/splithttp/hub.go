@@ -99,7 +99,7 @@ func (h *requestHandler) ServeHTTP(writer http.ResponseWriter, request *http.Req
 		return
 	}
 
-	if !strings.HasPrefix(request.URL.Path, h.path) {
+	if !h.config.isValidRequestPath(request.URL.Path, h.path) {
 		errors.LogInfo(context.Background(), "failed to validate path, request:", request.URL.Path, ", config:", h.path)
 		writer.WriteHeader(http.StatusNotFound)
 		return

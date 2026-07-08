@@ -275,6 +275,7 @@ type SplitHTTPConfig struct {
 	UplinkDataPlacement  string            `json:"uplinkDataPlacement"`
 	UplinkDataKey        string            `json:"uplinkDataKey"`
 	UplinkChunkSize      Int32Range        `json:"uplinkChunkSize"`
+	PathTrailingSlash    string            `json:"pathTrailingSlash"`
 	NoGRPCHeader         bool              `json:"noGRPCHeader"`
 	NoSSEHeader          bool              `json:"noSSEHeader"`
 	ScMaxEachPostBytes   Int32Range        `json:"scMaxEachPostBytes"`
@@ -396,6 +397,14 @@ func (c *SplitHTTPConfig) Build() (proto.Message, error) {
 		return nil, errors.New("unsupported seq placement: " + c.SeqPlacement)
 	}
 
+	switch c.PathTrailingSlash {
+	case "":
+		c.PathTrailingSlash = splithttp.PathTrailingSlashAlways
+	case splithttp.PathTrailingSlashAlways, splithttp.PathTrailingSlashAuto:
+	default:
+		return nil, errors.New("unsupported path trailing slash: " + c.PathTrailingSlash)
+	}
+
 	if c.SessionIDPlacement != "path" && c.SessionIDKey == "" {
 		switch c.SessionIDPlacement {
 		case "cookie", "query":
@@ -477,6 +486,7 @@ func (c *SplitHTTPConfig) Build() (proto.Message, error) {
 		UplinkDataPlacement:  c.UplinkDataPlacement,
 		UplinkDataKey:        c.UplinkDataKey,
 		UplinkChunkSize:      newRangeConfig(c.UplinkChunkSize),
+		PathTrailingSlash:    c.PathTrailingSlash,
 		NoGRPCHeader:         c.NoGRPCHeader,
 		NoSSEHeader:          c.NoSSEHeader,
 		ScMaxEachPostBytes:   newRangeConfig(c.ScMaxEachPostBytes),
